@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name       harmony synel countdown timer
 // @namespace  http://goralex.com
-// @version    1.0
+// @version    1.1
 // @description  counting of working day/month hours
 // @include    https://harmony.synel.co.il/eharmonynew
 // @copyright  Rishon (goralex.com)
@@ -69,7 +69,9 @@
         http.setRequestHeader('sessionId', sessionStorage.User.sessionId);
         http.send();
         http.onreadystatechange = (e) => {
-            next(JSON.parse(http.responseText));
+            if(http.readyState === 4 && http.status === 200){
+                next(JSON.parse(http.responseText));
+            }
         }
         //get by jQuery
         // $.ajax({
@@ -198,10 +200,10 @@
                 }
             });
 
-            if (todayArray.length === 0) {
-                alert(messages.dataProblem);
-                return;
-            }
+            // if (todayArray.length === 0) {
+            //     alert(messages.dataProblem);
+            //     return;
+            // }
 
             let todayTime = new Date();
             let totalTime = new Date();
@@ -220,9 +222,14 @@
 
             //validation start time and end time
             let todayLast = todayArray[todayArray.length - 1];
-            let today = todayArray[0];
-            today.Time_startA = todayLast.Time_startA;
-            today.Time_endA = todayLast.Time_endA;
+            let today = todayArray[0] || {};
+            if (Object.keys(today).length === 0) {
+                today.Time_startA = '';
+                today.Time_endA = '';
+            } else {
+                today.Time_startA = todayLast.Time_startA;
+                today.Time_endA = todayLast.Time_endA;
+            }
 
             if (today.Time_startA === '' || today.Time_endA !== '') {
 
