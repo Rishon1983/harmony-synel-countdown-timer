@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name       harmony synel countdown timer
 // @namespace  http://goralex.com
-// @version    1.1
+// @version    1.2
 // @description  counting of working day/month hours
 // @include    https://harmony.synel.co.il/eharmonynew
 // @copyright  Rishon (goralex.com)
@@ -24,8 +24,8 @@
 
     const putHTML = () => {
         let popupHTML =
-            '<style>#countdown-clock-popup{position:fixed;top:28px;display:flex;flex-direction:column;font-family:sans-serif;color:#fff;font-weight:100;text-align:center;font-size:45px;background-color:#9c9c9c;padding:25px 15px 0 15px;direction:ltr;z-index:9999}.content{overflow:hidden;transition:height .4s ease;cursor:move}#countdown-clock-popup .text{font-size:45px}#minimize{position:absolute;left:0;top:0;width:100%;height:25px;display:flex;align-items:center;justify-content:center;background-color:#767f76;cursor:pointer}#minimize:hover{background-color:#879487}#minimize .icon{font-size:32px;height:49px;transform:rotate(270deg)}#countdown-clock-popup .today,#countdown-clock-popup .total{width:315px;display:flex;align-items:baseline;justify-content:space-between}#countdown-clock-popup .today.red,#countdown-clock-popup .total.red{color:#f9d2d2}#countdown-clock-popup .today .one-numbers-container.minus,#countdown-clock-popup .total .one-numbers-container.minus{visibility:hidden}#countdown-clock-popup .today.red .one-numbers-container.minus,#countdown-clock-popup .total.red .one-numbers-container.minus{visibility:visible}#countdown-clock-popup .today{border-bottom:1px solid #c5c0c0}#countdown-clock-popup .clock-container{display:flex;align-items:baseline}#countdown-clock-popup .one-numbers-container{display:flex}#countdown-clock-popup .points{padding:0 3px}</style>' +
-            '<div id="countdown-clock-popup">  <div id="minimize">    <div class="icon">➧</div>  </div>  <div class="content">    <div class="today">    <div class="clock-container">      <div class="one-numbers-container minus">-</div>      <div class="one-numbers-container">        <span class="hours">--</span>        <span class="points">:</span>      </div>      <div class="one-numbers-container">        <span class="minutes">--</span>        <span class="points">:</span>      </div>      <div class="one-numbers-container">        <span class="seconds">--</span>      </div>    </div>    <div class="text">      היום    </div>  </div>  <div class="total">    <div class="clock-container">      <div class="one-numbers-container minus">-</div>      <div class="one-numbers-container">        <span class="hours">--</span>        <span class="points">:</span>      </div>      <div class="one-numbers-container">        <span class="minutes">--</span>        <span class="points">:</span>      </div>      <div class="one-numbers-container">        <span class="seconds">--</span>      </div>    </div>    <div class="text">      חודשי    </div>  </div>  </div>  </div>';
+            '<style>#countdown-clock-popup{position:fixed;top:28px;display:flex;flex-direction:column;font-family:sans-serif;color:#fff;font-weight:100;text-align:center;font-size:45px;background-color:#9c9c9c;padding:25px 15px 0 15px;direction:ltr;z-index:9999}.content{overflow:hidden;transition:height .4s ease;cursor:move}#countdown-clock-popup .text{font-size:45px}#minimize{position:absolute;left:0;top:0;width:100%;height:25px;display:flex;align-items:center;justify-content:center;background-color:#767f76;cursor:pointer}#minimize:hover{background-color:#879487}#minimize .icon{font-size:32px;height:49px;transform:rotate(270deg)}#countdown-clock-popup .today,#countdown-clock-popup .total,#countdown-clock-popup .total-hours{width:315px;display:flex;align-items:baseline;justify-content:space-between}#countdown-clock-popup .total-hours{padding-left:15px}#countdown-clock-popup .today.red,#countdown-clock-popup .total.red{color:#f9d2d2}#countdown-clock-popup .today .one-numbers-container.minus,#countdown-clock-popup .total .one-numbers-container.minus{visibility:hidden}#countdown-clock-popup .today.red .one-numbers-container.minus,#countdown-clock-popup .total.red .one-numbers-container.minus{visibility:visible}#countdown-clock-popup .today,#countdown-clock-popup .total{border-bottom:1px solid #c5c0c0}#countdown-clock-popup .clock-container{display:flex;align-items:baseline}#countdown-clock-popup .one-numbers-container{display:flex}#countdown-clock-popup .points{padding:0 3px}</style>' +
+            '<div id="countdown-clock-popup"><div id="minimize"><div class="icon">➧</div></div><div class="content"><div class="today"><div class="clock-container"><div class="one-numbers-container minus">-</div><div class="one-numbers-container"> <span class="hours">--</span> <span class="points">:</span></div><div class="one-numbers-container"> <span class="minutes">--</span> <span class="points">:</span></div><div class="one-numbers-container"> <span class="seconds">--</span></div></div><div class="text"> היום</div></div><div class="total"><div class="clock-container"><div class="one-numbers-container minus">-</div><div class="one-numbers-container"> <span class="hours">--</span> <span class="points">:</span></div><div class="one-numbers-container"> <span class="minutes">--</span> <span class="points">:</span></div><div class="one-numbers-container"> <span class="seconds">--</span></div></div><div class="text"> חודשי</div></div><div class="total-hours"><div class="clock-container"><div class="one-numbers-container"> <span class="hours">--</span> <span class="points">:</span></div><div class="one-numbers-container"> <span class="minutes">--</span></div></div><div class="text"> סה"כ</div></div></div></div>';
 
         let applicationHostDocument = document.getElementById('applicationHost');
         applicationHostDocument.insertAdjacentHTML('beforeend', popupHTML);
@@ -104,7 +104,7 @@
         };
     };
 
-    const initializeClock = (todayTime, totalTime) => {
+    const initializeClock = (todayTime, totalTime, daysDataArray, startTime) => {
 
         let todayTimeWithMinus = false;
         let totalTimeWithMinus = false;
@@ -119,6 +119,9 @@
         let minutesElementTotal = clock.querySelector('.total .minutes');
         let secondsElementTotal = clock.querySelector('.total .seconds');
 
+        let totalHoursElement = clock.querySelector('.total-hours .hours');
+        let totalMinutesElement = clock.querySelector('.total-hours .minutes');
+
         let updateClock = () => {
             let todayUpdateTime = getTimeRemaining(todayTime);
             let totalUpdateTime = getTimeRemaining(totalTime);
@@ -132,6 +135,32 @@
             hoursElementTotal.innerHTML = twoNumbersFormat(totalUpdateTime.hours);
             minutesElementTotal.innerHTML = twoNumbersFormat(totalUpdateTime.minutes);
             secondsElementTotal.innerHTML = twoNumbersFormat(totalUpdateTime.seconds);
+
+            //work hours in the current month
+            if(totalUpdateTime.seconds === 59 || true){
+                let totalMinutes = 0;
+
+                daysDataArray.forEach((day) => {
+                    if(day.NameAbsenceCodeAW === ''){
+                        let dayHours = Number(day.Day_TotalAW.split(":")[0]);
+                        let dayMinutes = Number(day.Day_TotalAW.split(":")[1]);
+                        totalMinutes = totalMinutes + (dayHours * 60) + dayMinutes;
+                    }
+                });
+
+                let workedTimeToday = 0;
+                let todayWorkedMinutes = 0;
+                let todayWorkedHours = 0;
+                if(startTime){
+                    workedTimeToday = new Date().getTime() - new Date(startTime);
+                    todayWorkedMinutes = Math.floor((workedTimeToday / 1000 / 60) % 60);
+                    todayWorkedHours = Math.floor((workedTimeToday / (1000 * 60 * 60)));
+                }
+                totalMinutes = totalMinutes + todayWorkedMinutes + todayWorkedHours*60;
+
+                totalHoursElement.innerHTML = Math.floor((totalMinutes / 60));
+                totalMinutesElement.innerHTML = twoNumbersFormat(Math.floor((totalMinutes) % 60));
+            }
 
             //validation if time is negative and add or remove class 'red'
             if (todayTimeWithMinus !== todayUpdateTime.minus) {
@@ -249,9 +278,27 @@
                 let hoursElementTotal = clock.querySelector('.total .hours');
                 let minutesElementTotal = clock.querySelector('.total .minutes');
                 let secondsElementTotal = clock.querySelector('.total .seconds');
-                hoursElementTotal.innerHTML = Math.floor((totalMinutes * totalMinutesMinusCoefficient / 60) % 60);
+                hoursElementTotal.innerHTML = Math.floor((totalMinutes * totalMinutesMinusCoefficient / 60));
                 minutesElementTotal.innerHTML = Math.floor((totalMinutes * totalMinutesMinusCoefficient) % 60);
                 secondsElementTotal.innerHTML = '00';
+
+                //work hours in the current month
+                let totalHoursElement = clock.querySelector('.total-hours .hours');
+                let totalMinutesElement = clock.querySelector('.total-hours .minutes');
+
+                let totalMainMinutes = 0;
+                daysDataArray.forEach((day) => {
+                    if(day.NameAbsenceCodeAW === ''){
+                        let dayMainHours = Number(day.Day_TotalAW.split(":")[0]);
+                        let dayMainMinutes = Number(day.Day_TotalAW.split(":")[1]);
+                        totalMainMinutes = totalMainMinutes + (dayMainHours * 60) + dayMainMinutes;
+                    }
+                });
+
+                totalHoursElement.innerHTML = Math.floor((totalMainMinutes / 60));
+                totalMinutesElement.innerHTML = twoNumbersFormat(Math.floor((totalMainMinutes) % 60));
+
+
 
             } else {
                 //calc hours and minuts: start time plus expected time
@@ -290,7 +337,7 @@
                 });
 
                 totalTime.setHours(startHour, startMinutes - totalMinutes);
-                initializeClock(todayTime, totalTime);
+                initializeClock(todayTime, totalTime, daysDataArray, startTime);
             }
         });
 
